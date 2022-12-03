@@ -46,6 +46,11 @@
   "engines": {
     "node": ">=16.13.0"
   },
+  "lint-staged": {
+    "*.ts": [
+      "yarn lint"
+    ]
+  },
   "alias": {
     "@src/*": "./src/$1",
     "@config/*": "./src/config/$1",
