@@ -5,7 +5,7 @@ const router = express.Router();
 const defaultRoutes = [
   {
     path: '/test_route',
-    route: (_req: Request, res) => {
+    route: (_req: Request, res: Response) => {
       res.status(200).send('OK');
     },
   },
