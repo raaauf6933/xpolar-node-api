@@ -20,4 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // v1 api routes
 app.use('/v1', routes);
 
+// root route
+app.get('/', (_, res) => res.send('Server is running...'));
+
 export default app;

@@ -16,6 +16,7 @@ const vars = {
     username: process.env.EMAIL_USERNAME,
     password: process.env.EMAIL_PASSWORD,
   },
+  graphql_port: process.env.GRAPHQL_PORT || 5001,
 };
 
 export default vars;

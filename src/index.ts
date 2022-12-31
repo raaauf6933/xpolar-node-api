@@ -1,42 +1,28 @@
 import logger from './config/logger';
 import vars from './config/vars';
-import app from './config/express';
+import apolloApp from './config/apollo_server';
+import expressApp from './config/express';
 
-// listen to requests
-const server = app.listen(vars.port, () =>
+import { restHandlers } from './config/handlers';
+
+// GraphQL Server
+const graphQlServer = apolloApp.listen(vars.graphql_port, () =>
   logger.info(
-    `🚀 🚀 🚀 server started on port ${vars.port} (${vars.env}) 🚀 🚀 🚀`
+    `🚀 🚀 🚀 GraphQL started on port ${vars.graphql_port} (${vars.env}) 🚀 🚀 🚀`
   )
 );
 
-const exitHandler = () => {
-  if (server) {
-    server.close(() => {
-      logger.info('Server closed');
-      process.exit(1);
-    });
-  } else {
-    process.exit(1);
-  }
-};
+// listen to requests
+const restApiServer = expressApp.listen(vars.port, () =>
+  logger.info(
+    `🚀 🚀 🚀 REST server started on port ${vars.port} (${vars.env}) 🚀 🚀 🚀`
+  )
+);
 
-const unexpectedErrorHandler = (error: unknown) => {
-  logger.error(error);
-  exitHandler();
-};
-
-process.on('uncaughtException', unexpectedErrorHandler);
-process.on('unhandledRejection', unexpectedErrorHandler);
-
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received');
-  if (server) {
-    server.close();
-  }
-});
+restHandlers(restApiServer, graphQlServer);
 
 /**
  * Exports express
  * @public
  */
-export default app;
+// export default app;

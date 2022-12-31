@@ -1,0 +1,36 @@
+type Error {
+  field: String
+  message: String
+}
+
+enum UserType {
+  SUPER_ADMIN
+  ADMIN
+}
+
+scalar DateTime
+
+type Client {
+  id: ID
+  name: String
+  status: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input createClientInput {
+  name: String!
+}
+
+type CreateClient {
+  errors: [Error]
+  client: Client
+}
+
+type Query {
+  clients: [Client]
+}
+
+type Mutation {
+  createClient(input: createClientInput!): CreateClient
+}
