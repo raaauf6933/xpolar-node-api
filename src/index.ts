@@ -2,8 +2,11 @@ import logger from './config/logger';
 import vars from './config/vars';
 import apolloApp from './config/apollo_server';
 import expressApp from './config/express';
-
+import DB_init from './config/db_connection';
 import { restHandlers } from './config/handlers';
+
+// Test db connection
+DB_init();
 
 // GraphQL Server
 const graphQlServer = apolloApp.listen(vars.graphql_port, () =>

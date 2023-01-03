@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "NODE_NO_WARNINGS=1 nodemon --watch './**/*.ts'  --exec  'npm run build-types && node --experimental-specifier-resolution=node --loader ts-node/esm'  src/index.ts ",
-    "start": "NODE_ENV=production node --experimental-specifier-resolution=node --loader ts-node/esm src/index.ts",
+    "dev": "NODE_NO_WARNINGS=1 nodemon --watch './**/*.ts'  --exec  'npm run build-types &&  tsx'  src/index.ts ",
+    "start": "tsx src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ignore-path .gitignore  --ext .ts",
     "prettier": "prettier --ignore-path .gitignore \"**/*.+(json|js|ts)\"",
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.16.2",
+    "@graphql-codegen/introspection": "2.2.3",
     "@graphql-codegen/typescript": "2.8.6",
     "@graphql-codegen/typescript-resolvers": "2.7.11",
     "@types/cors": "^2.8.12",
@@ -48,9 +49,9 @@
     "prettier": "^2.8.0",
     "prisma": "4.7.0",
     "ts-node": "^10.9.1",
+    "tsx": "^3.12.1",
     "typescript": "^4.9.3",
-    "winston": "^3.8.2",
-    "@graphql-codegen/introspection": "2.2.3"
+    "winston": "^3.8.2"
   },
   "engines": {
     "node": ">=16.13.0"

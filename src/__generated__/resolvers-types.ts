@@ -20,9 +20,14 @@ export type Client = {
   createdAt?: Maybe<Scalars['DateTime']>;
   id?: Maybe<Scalars['ID']>;
   name?: Maybe<Scalars['String']>;
-  status?: Maybe<Scalars['String']>;
+  status: CommonStatus;
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
+
+export enum CommonStatus {
+  Act = 'ACT',
+  Deact = 'DEACT'
+}
 
 export type CreateClient = {
   __typename?: 'CreateClient';
@@ -58,6 +63,7 @@ export enum UserType {
 
 export type CreateClientInput = {
   name: Scalars['String'];
+  status: CommonStatus;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -132,6 +138,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Client: ResolverTypeWrapper<Client>;
+  CommonStatus: CommonStatus;
   CreateClient: ResolverTypeWrapper<CreateClient>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
   Error: ResolverTypeWrapper<Error>;
@@ -161,7 +168,7 @@ export type ClientResolvers<ContextType = any, ParentType extends ResolversParen
   createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['CommonStatus'], ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

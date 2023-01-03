@@ -8,18 +8,24 @@ enum UserType {
   ADMIN
 }
 
+enum CommonStatus {
+  ACT
+  DEACT
+}
+
 scalar DateTime
 
 type Client {
   id: ID
   name: String
-  status: String
+  status: CommonStatus!
   createdAt: DateTime
   updatedAt: DateTime
 }
 
 input createClientInput {
   name: String!
+  status: CommonStatus!
 }
 
 type CreateClient {

@@ -6,7 +6,7 @@ import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { readFileSync } from 'fs';
-import { resolvers } from '../resolvers/resolvers.js';
+import { resolvers } from '@resolvers/resolvers';
 
 const typeDefs = readFileSync('./src/schema/schema.graphql', {
   encoding: 'utf-8',
@@ -14,6 +14,7 @@ const typeDefs = readFileSync('./src/schema/schema.graphql', {
 
 const app = express();
 const graphQlServer = http.createServer(app);
+
 
 // Set up Apollo Server
 const server = new ApolloServer({
