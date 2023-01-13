@@ -1,6 +1,25 @@
+interface Node {
+  id: ID!
+}
+
+# Scalars
+scalar DateTime
+scalar Time
+scalar Date
+scalar Upload #File Upload
 type Error {
   field: String
   message: String
+}
+
+type Pagination {
+  page: Int
+  limit: Int
+}
+
+type PageInfo {
+  next: Pagination
+  previous: Pagination
 }
 
 enum UserType {
@@ -13,18 +32,72 @@ enum CommonStatus {
   DEACT
 }
 
-scalar DateTime
+enum OrderDirection {
+  asc
+  desc
+}
 
 type Client {
-  id: ID
+  id: ID!
   name: String
+  code: Int
   status: CommonStatus!
   createdAt: DateTime
   updatedAt: DateTime
 }
 
+type CaseBatch {
+  id: ID!
+  client: Client
+  batch_id: String
+  batch_reference: String
+  assignmentStartDate: DateTime
+  assignmentEndDate: DateTime
+  status: String
+  isDeleted: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+  cases: [Cases]
+}
+
+type Cases {
+  id: ID!
+  caseBatch: CaseBatch
+  person: Person
+  isDeleted: Boolean
+}
+
+type Person {
+  id: ID!
+  Cases: Cases
+  isDeleted: Boolean
+}
+
+type ClientCountableConnection {
+  pageInfo: PageInfo!
+  edges: [ClientCountableEdge!]!
+  count: Int!
+  totalCount: Int!
+}
+
+type CaseBatchesCountableConnection {
+  pageInfo: PageInfo!
+  edges: [CaseBatchesCountableEdge!]!
+  count: Int!
+  totalCount: Int!
+}
+
+type ClientCountableEdge {
+  node: Client!
+}
+
+type CaseBatchesCountableEdge {
+  node: CaseBatch!
+}
+
 input createClientInput {
   name: String!
+  code: Int!
   status: CommonStatus!
 }
 
@@ -33,10 +106,31 @@ type CreateClient {
   client: Client
 }
 
+input importCasesInput {
+  client: ID!
+  assignmentStartDate: Date!
+  assignmentEndDate: Date!
+}
+
+input CaseBatchesSortingInput {
+  direction: OrderDirection!
+}
+
+type ImportCases {
+  errors: [Error]
+  caseBatch: CaseBatch
+}
+
 type Query {
-  clients: [Client]
+  clients(page: Int!, limit: Int!): ClientCountableConnection
+  caseBatches(
+    page: Int!
+    limit: Int!
+    sortBy: CaseBatchesSortingInput
+  ): CaseBatchesCountableConnection
 }
 
 type Mutation {
   createClient(input: createClientInput!): CreateClient
+  importCases(input: importCasesInput!, file: Upload): ImportCases
 }

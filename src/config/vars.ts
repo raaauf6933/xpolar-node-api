@@ -17,6 +17,14 @@ const vars = {
     password: process.env.EMAIL_PASSWORD,
   },
   graphql_port: process.env.GRAPHQL_PORT || 5001,
+  s3: {
+    bucket: process.env.S3_BUCKET || 'xpolar-dev-bucket',
+    endpoint: process.env.S3_ENDPOINT,
+    accessKeyId: process.env.S3_ACESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    sslEnabled: false,
+    s3ForcePathStyle: true,
+  },
 };
 
 export default vars;

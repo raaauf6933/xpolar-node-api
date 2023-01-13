@@ -8,17 +8,87 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+enum CommonStatus {
+  ACT
+  DEACT
+}
+
+enum CaseBatchStatus {
+  SUCCESS
+  UPLOADING
+  FAILED
+}
+
+model client {
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(255)
+  code        Int        
+  status     CommonStatus 
+  isDeleted  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  case_batch case_batch[]
+}
+
+model case_batch {
+  id        Int    @id @default(autoincrement())
+  client    client @relation(fields: [client_id], references: [id])
+  client_id Int
+  batch_reference String
+  batch_id String
+  assignment_start_date DateTime
+  assignment_end_date DateTime
+  status CaseBatchStatus
+  isDeleted  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  cases cases[]
+}
+
+model cases {
+  id Int    @id @default(autoincrement())
+  case_batch case_batch @relation(fields: [case_batch_id], references: [id])
+  case_batch_id Int
+  case_reference String
+  case_unique_batch_id String
+  person person @relation(fields: [person_id], references: [id])
+  person_id Int
+  isDeleted  Boolean      @default(false)
+}
+
+model person {
+  id Int @id @default(autoincrement())
+  cases cases[]
+  contacts contacts[]
+  address address[]
+  isDeleted  Boolean      @default(false)
 }
 
 
+model contacts {
+  id  Int    @id @default(autoincrement())
+  person person @relation(fields: [person_id], references: [id])
+  person_id Int
+  isDeleted  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
 
-model client {
-  id        Int      @id @default(autoincrement())
-  name  String   @db.VarChar(255) 
-  status Int
-  isDeleted Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model address {
+  id  Int    @id @default(autoincrement())
+  person person @relation(fields: [person_id], references: [id])
+  person_id Int
+  isDeleted  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model test_upload {
+  id  Int    @id @default(autoincrement())
+  first_name String
 }
 
 // model Profile {

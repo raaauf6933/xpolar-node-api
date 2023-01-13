@@ -1,16 +1,15 @@
-import { CommonStatus } from '@/__generated__/resolvers-types';
+import { QueryClientsArgs } from '@/__generated__/resolvers-types';
 import { PrismaClient } from '@prisma/client';
+import { nodeListPaginate } from '@utils/nodeListPaginate';
 
 const prisma = new PrismaClient();
 
-const Clients = async () => {
+const Clients = async (_, args: QueryClientsArgs) => {
+  const { limit, page } = args;
   try {
-    const result = await prisma.client.findMany();
+    const clients = await prisma.client.findMany();
 
-    return result.map((e) => ({
-      ...e,
-      status: e.status ? CommonStatus.Act : CommonStatus.Deact,
-    }));
+    return nodeListPaginate(page, limit, clients);
   } catch (error) {
     return error;
   }
