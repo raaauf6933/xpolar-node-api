@@ -1,7 +1,8 @@
 import { MutationImportCasesArgs } from '@/__generated__/resolvers-types';
 import { MyContext } from '@/config/context';
-import createNewBatchId from '@/helpers/createNewBatchId';
-import ImportCsvToJson from '@/helpers/importCsvToJson';
+import CreateCasebatch from '@/controller/cases/ImportCases/createCaseBatch';
+import CreateCases from '@/controller/cases/ImportCases/createCases';
+import { ImportCaseValidator } from '@/controller/cases/ImportCases/importCases.validator';
 
 const ImportCases = async (
   _,
@@ -10,55 +11,24 @@ const ImportCases = async (
 ) => {
   const { prisma } = context;
   try {
-    const json = await ImportCsvToJson(args.file);
+    // validator
+    const { errors, data } = await ImportCaseValidator(args);
+    if (errors) return { errors };
 
-    const { id: batch_reference } = await createNewBatchId(args.input.client, {
-      code: true,
-    });
-    const { id: batch_id } = await createNewBatchId(args.input.client, {
-      code: false,
-    });
+    // if there's no then error proceed
 
-    const result = await prisma.case_batch.create({
-      data: {
-        assignment_end_date: new Date(
-          args.input.assignmentEndDate
-        ).toISOString(),
-        assignment_start_date: new Date(
-          args.input.assignmentStartDate
-        ).toISOString(),
-        batch_reference,
-        batch_id,
-        status: 'UPLOADING',
-        client: {
-          connect: {
-            id: parseInt(args.input.client),
-          },
-        },
-      },
-      include: {
-        client: true,
-      },
-    });
+    // create Batch
+    const caseBatch = await CreateCasebatch(data.args, prisma);
 
-    if (Array.isArray(json)) {
-      const testData = json.map((test) => ({ first_name: test.first_name }));
-      await prisma.test_upload.createMany({
-        data: testData,
-      });
-    }
-
-    const caseBatch = {
-      ...result,
-    };
+    // create Cases
+    CreateCases(data.args, caseBatch, data.cases, prisma);
 
     return {
       caseBatch,
+      error: null,
     };
   } catch (error) {
-    return {
-      errors: error,
-    };
+    return error;
   }
 };
 

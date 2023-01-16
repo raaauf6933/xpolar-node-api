@@ -1,15 +1,13 @@
 import { QueryClientsArgs } from '@/__generated__/resolvers-types';
-import { PrismaClient } from '@prisma/client';
+import findClients from '@/prismaQueries/clients/findClients';
 import { nodeListPaginate } from '@utils/nodeListPaginate';
-
-const prisma = new PrismaClient();
 
 const Clients = async (_, args: QueryClientsArgs) => {
   const { limit, page } = args;
   try {
-    const clients = await prisma.client.findMany();
+    const { count, clients } = await findClients();
 
-    return nodeListPaginate(page, limit, clients);
+    return nodeListPaginate(page, limit, clients, count);
   } catch (error) {
     return error;
   }

@@ -16,15 +16,26 @@ type Pagination {
   page: Int
   limit: Int
 }
+type PaginationItems {
+  from: Int
+  to: Int
+}
 
 type PageInfo {
   next: Pagination
   previous: Pagination
+  showing: PaginationItems
 }
 
 enum UserType {
   SUPER_ADMIN
   ADMIN
+}
+
+enum CaseBatchStatus {
+  UPLOADING
+  SUCCESS
+  FAILED
 }
 
 enum CommonStatus {
@@ -41,7 +52,7 @@ type Client {
   id: ID!
   name: String
   code: Int
-  status: CommonStatus!
+  status: CommonStatus
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -49,28 +60,62 @@ type Client {
 type CaseBatch {
   id: ID!
   client: Client
-  batch_id: String
-  batch_reference: String
+  batchId: String
+  batchReference: String
   assignmentStartDate: DateTime
   assignmentEndDate: DateTime
-  status: String
+  status: CaseBatchStatus
   isDeleted: Boolean
   createdAt: DateTime
   updatedAt: DateTime
-  cases: [Cases]
+  cases: [Case]
 }
 
-type Cases {
+type Case {
   id: ID!
+  caseReference: String
+  caseUniqueBatchId: String
+  clientReference: String
   caseBatch: CaseBatch
   person: Person
   isDeleted: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type Person {
   id: ID!
-  Cases: Cases
+  cases: Case
+  firstName: String
+  lastName: String
+  birthDay: String
+  gender: String
+  address: [Address]
+  contacs: [Contacts]
   isDeleted: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type Address {
+  id: ID!
+  person: Person
+  address: String
+  city: String
+  zipCode: String
+  region: String
+  isDeleted: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type Contacts {
+  id: ID!
+  person: Person
+  type: String
+  contactValue: String
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type ClientCountableConnection {
@@ -87,12 +132,23 @@ type CaseBatchesCountableConnection {
   totalCount: Int!
 }
 
+type CasesCountableConnection {
+  pageInfo: PageInfo!
+  edges: [CasesCountableEdge!]!
+  count: Int!
+  totalCount: Int!
+}
+
 type ClientCountableEdge {
   node: Client!
 }
 
 type CaseBatchesCountableEdge {
   node: CaseBatch!
+}
+
+type CasesCountableEdge {
+  node: Case!
 }
 
 input createClientInput {
@@ -116,12 +172,30 @@ input CaseBatchesSortingInput {
   direction: OrderDirection!
 }
 
+input CasesSortingInput {
+  direction: OrderDirection!
+}
+
+input CasesFilterInput {
+  batchNumber: String
+  clientReference: String
+  firstName: String
+  lastName: String
+}
+
 type ImportCases {
   errors: [Error]
   caseBatch: CaseBatch
 }
 
 type Query {
+  cases(
+    page: Int!
+    limit: Int!
+    sortBy: CasesSortingInput
+    filter: CasesFilterInput
+  ): CasesCountableConnection
+  case(id: ID!): Case
   clients(page: Int!, limit: Int!): ClientCountableConnection
   caseBatches(
     page: Int!

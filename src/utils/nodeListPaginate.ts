@@ -3,18 +3,17 @@ import { PageInfo } from '@types';
 export const nodeListPaginate = <T extends object>(
   page: number,
   limit: number,
-  data: T[]
+  data: T[],
+  count: number
 ) => {
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
 
-  const result = data
-    .slice(startIndex, endIndex)
-    .map((e) => ({ node: { ...e } }));
+  const result = data.map((e) => ({ node: { ...e } }));
 
   const pageInfo: PageInfo = {};
 
-  if (endIndex < data.length) {
+  if (endIndex < count) {
     pageInfo.next = {
       page: page + 1,
       limit: limit,
@@ -28,10 +27,18 @@ export const nodeListPaginate = <T extends object>(
     };
   }
 
+  const from = page * limit - (limit - 1);
+  const to = Math.min(from + limit - 1, count);
+
+  pageInfo.showing = {
+    from: from,
+    to: to,
+  };
+
   return {
     edges: result,
-    count: result.length,
-    totalCount: data.length,
+    count: data.length,
+    totalCount: count,
     pageInfo,
   };
 };

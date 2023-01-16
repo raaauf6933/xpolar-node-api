@@ -13,8 +13,9 @@
     "prepare": "husky install",
     "format": "yarn prettier --write",
     "build-types": "graphql-codegen --config codegen.yml",
+    "p-studio": "prisma studio",
     "db-migrate:dev": "yarn prisma migrate dev",
-    "generate-s3": "awslocal s3api create-bucket --bucket xpolar-dev-bucket"
+    "generate-s3:dev": "awslocal s3api create-bucket --bucket xpolar-dev-bucket"
   },
   "keywords": [],
   "author": "",

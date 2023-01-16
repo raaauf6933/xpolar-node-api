@@ -1,9 +1,7 @@
 import logger from './config/logger';
 import vars from './config/vars';
 import apolloApp from './config/apollo_server';
-import expressApp from './config/express';
 import DB_init from './config/db_connection';
-import { restHandlers } from './config/handlers';
 
 // Test db connection
 DB_init();
@@ -15,14 +13,32 @@ const graphQlServer = apolloApp.listen(vars.graphql_port, () =>
   )
 );
 
-// listen to requests
-const restApiServer = expressApp.listen(vars.port, () =>
-  logger.info(
-    `🚀 🚀 🚀 REST server started on port ${vars.port} (${vars.env}) 🚀 🚀 🚀`
-  )
-);
+const exitHandler = () => {
+  if (graphQlServer) {
+    graphQlServer.close(() => {
+      logger.info('Server closed');
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+};
 
-restHandlers(restApiServer, graphQlServer);
+const unexpectedErrorHandler = (error: unknown) => {
+  logger.error(error);
+  exitHandler();
+};
+
+process.on('uncaughtException', unexpectedErrorHandler);
+process.on('unhandledRejection', unexpectedErrorHandler);
+
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received');
+
+  if (graphQlServer) {
+    graphQlServer.close();
+  }
+});
 
 /**
  * Exports express

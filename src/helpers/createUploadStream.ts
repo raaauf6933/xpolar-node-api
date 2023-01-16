@@ -1,11 +1,34 @@
 import vars from '@/config/vars';
 import { parse } from 'path';
 import uploadToS3, { s3 } from './uploadToS3';
+import { ReadStream } from 'fs';
+import { genericError } from '@utils/errors';
 
-const createUploadStream = async (file) => {
+type FileData = Promise<{
+  filename: string;
+  mimetype: string;
+  encoding: string;
+  createReadStream: () => ReadStream;
+}>;
+
+interface createUploadStreamOpts {
+  fileExtensions: string[];
+}
+
+const createUploadStream = async (
+  file: FileData,
+  options: createUploadStreamOpts
+) => {
   const { filename, createReadStream } = await file;
 
   const { ext, name } = parse(filename);
+
+  if (options.fileExtensions.some((e) => e !== ext))
+    throw new genericError(
+      'GENERIC_ERROR',
+      'YOUR_ERROR_CODE',
+      `file format must be in ${options.fileExtensions.join(',')}`
+    );
 
   const newFileName = `${name}-${Date.now()}${ext}`;
 

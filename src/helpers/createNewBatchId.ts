@@ -17,13 +17,13 @@ const createNewBatchId = async (
 
     const last_batch = await prisma.case_batch.findMany({
       where: {
-        client_id: client?.id,
+        clientId: client?.id,
       },
       take: -1,
     });
 
-    const last_batch_id = last_batch[0]?.batch_id
-      ? parseInt(last_batch[0].batch_id) + 1
+    const last_batch_id = last_batch[0]?.batchId
+      ? parseInt(last_batch[0].batchId) + 1
       : 1;
 
     const batchID = new Intl.NumberFormat('en-US', {

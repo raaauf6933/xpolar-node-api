@@ -8,7 +8,6 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 enum CommonStatus {
@@ -30,17 +29,17 @@ model client {
   isDeleted  Boolean      @default(false)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
-  case_batch case_batch[]
+  caseBatch case_batch[]
 }
 
 model case_batch {
   id        Int    @id @default(autoincrement())
-  client    client @relation(fields: [client_id], references: [id])
-  client_id Int
-  batch_reference String
-  batch_id String
-  assignment_start_date DateTime
-  assignment_end_date DateTime
+  client    client @relation(fields: [clientId], references: [id])
+  clientId Int
+  batchReference String
+  batchId String
+  assignmentStartDate DateTime
+  assignmentEndDate DateTime
   status CaseBatchStatus
   isDeleted  Boolean      @default(false)
   createdAt  DateTime     @default(now())
@@ -50,13 +49,16 @@ model case_batch {
 
 model cases {
   id Int    @id @default(autoincrement())
-  case_batch case_batch @relation(fields: [case_batch_id], references: [id])
-  case_batch_id Int
-  case_reference String
-  case_unique_batch_id String
-  person person @relation(fields: [person_id], references: [id])
-  person_id Int
+  caseBatch case_batch @relation(fields: [caseBatchId], references: [id])
+  caseBatchId Int
+  caseReference String
+  clientReference String @default("")
+  caseUniqueBatchId String
+  person person @relation(fields: [personId], references: [id])
+  personId Int
   isDeleted  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 }
 
 model person {
@@ -64,14 +66,22 @@ model person {
   cases cases[]
   contacts contacts[]
   address address[]
+  firstName String
+  lastName String
+  birthDay String
+  gender String
   isDeleted  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt @default(now())
 }
 
 
 model contacts {
   id  Int    @id @default(autoincrement())
-  person person @relation(fields: [person_id], references: [id])
-  person_id Int
+  person person @relation(fields: [personId], references: [id])
+  personId Int
+  type String
+  contactValue String
   isDeleted  Boolean      @default(false)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
@@ -79,29 +89,14 @@ model contacts {
 
 model address {
   id  Int    @id @default(autoincrement())
-  person person @relation(fields: [person_id], references: [id])
-  person_id Int
+  person person @relation(fields: [personId], references: [id])
+  personId Int
+  address String
+  city String
+  zipCode String
+  region String
   isDeleted  Boolean      @default(false)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
 }
 
-model test_upload {
-  id  Int    @id @default(autoincrement())
-  first_name String
-}
-
-// model Profile {
-//   id     Int     @id @default(autoincrement())
-//   bio    String?
-//   user   User    @relation(fields: [userId], references: [id])
-//   userId Int     @unique
-// }
-
-// model User {
-//   id      Int      @id @default(autoincrement())
-//   email   String   @unique
-//   name    String?
-//   posts   Post[]
-//   profile Profile?
-// }

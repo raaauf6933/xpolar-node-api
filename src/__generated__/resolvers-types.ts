@@ -19,20 +19,52 @@ export type Scalars = {
   Upload: any;
 };
 
+export type Address = {
+  __typename?: 'Address';
+  address?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  id: Scalars['ID'];
+  isDeleted?: Maybe<Scalars['Boolean']>;
+  person?: Maybe<Person>;
+  region?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  zipCode?: Maybe<Scalars['String']>;
+};
+
+export type Case = {
+  __typename?: 'Case';
+  caseBatch?: Maybe<CaseBatch>;
+  caseReference?: Maybe<Scalars['String']>;
+  caseUniqueBatchId?: Maybe<Scalars['String']>;
+  clientReference?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  id: Scalars['ID'];
+  isDeleted?: Maybe<Scalars['Boolean']>;
+  person?: Maybe<Person>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
 export type CaseBatch = {
   __typename?: 'CaseBatch';
   assignmentEndDate?: Maybe<Scalars['DateTime']>;
   assignmentStartDate?: Maybe<Scalars['DateTime']>;
-  batch_id?: Maybe<Scalars['String']>;
-  batch_reference?: Maybe<Scalars['String']>;
-  cases?: Maybe<Array<Maybe<Cases>>>;
+  batchId?: Maybe<Scalars['String']>;
+  batchReference?: Maybe<Scalars['String']>;
+  cases?: Maybe<Array<Maybe<Case>>>;
   client?: Maybe<Client>;
   createdAt?: Maybe<Scalars['DateTime']>;
   id: Scalars['ID'];
   isDeleted?: Maybe<Scalars['Boolean']>;
-  status?: Maybe<Scalars['String']>;
+  status?: Maybe<CaseBatchStatus>;
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
+
+export enum CaseBatchStatus {
+  Failed = 'FAILED',
+  Success = 'SUCCESS',
+  Uploading = 'UPLOADING'
+}
 
 export type CaseBatchesCountableConnection = {
   __typename?: 'CaseBatchesCountableConnection';
@@ -51,12 +83,28 @@ export type CaseBatchesSortingInput = {
   direction: OrderDirection;
 };
 
-export type Cases = {
-  __typename?: 'Cases';
-  caseBatch?: Maybe<CaseBatch>;
-  id: Scalars['ID'];
-  isDeleted?: Maybe<Scalars['Boolean']>;
-  person?: Maybe<Person>;
+export type CasesCountableConnection = {
+  __typename?: 'CasesCountableConnection';
+  count: Scalars['Int'];
+  edges: Array<CasesCountableEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int'];
+};
+
+export type CasesCountableEdge = {
+  __typename?: 'CasesCountableEdge';
+  node: Case;
+};
+
+export type CasesFilterInput = {
+  batchNumber?: InputMaybe<Scalars['String']>;
+  clientReference?: InputMaybe<Scalars['String']>;
+  firstName?: InputMaybe<Scalars['String']>;
+  lastName?: InputMaybe<Scalars['String']>;
+};
+
+export type CasesSortingInput = {
+  direction: OrderDirection;
 };
 
 export type Client = {
@@ -65,7 +113,7 @@ export type Client = {
   createdAt?: Maybe<Scalars['DateTime']>;
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
-  status: CommonStatus;
+  status?: Maybe<CommonStatus>;
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
@@ -86,6 +134,16 @@ export enum CommonStatus {
   Act = 'ACT',
   Deact = 'DEACT'
 }
+
+export type Contacts = {
+  __typename?: 'Contacts';
+  contactValue?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  id: Scalars['ID'];
+  person?: Maybe<Person>;
+  type?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
 
 export type CreateClient = {
   __typename?: 'CreateClient';
@@ -135,6 +193,7 @@ export type PageInfo = {
   __typename?: 'PageInfo';
   next?: Maybe<Pagination>;
   previous?: Maybe<Pagination>;
+  showing?: Maybe<PaginationItems>;
 };
 
 export type Pagination = {
@@ -143,17 +202,38 @@ export type Pagination = {
   page?: Maybe<Scalars['Int']>;
 };
 
+export type PaginationItems = {
+  __typename?: 'PaginationItems';
+  from?: Maybe<Scalars['Int']>;
+  to?: Maybe<Scalars['Int']>;
+};
+
 export type Person = {
   __typename?: 'Person';
-  Cases?: Maybe<Cases>;
+  address?: Maybe<Array<Maybe<Address>>>;
+  birthDay?: Maybe<Scalars['String']>;
+  cases?: Maybe<Case>;
+  contacs?: Maybe<Array<Maybe<Contacts>>>;
+  createdAt?: Maybe<Scalars['DateTime']>;
+  firstName?: Maybe<Scalars['String']>;
+  gender?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   isDeleted?: Maybe<Scalars['Boolean']>;
+  lastName?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type Query = {
   __typename?: 'Query';
+  case?: Maybe<Case>;
   caseBatches?: Maybe<CaseBatchesCountableConnection>;
+  cases?: Maybe<CasesCountableConnection>;
   clients?: Maybe<ClientCountableConnection>;
+};
+
+
+export type QueryCaseArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -161,6 +241,14 @@ export type QueryCaseBatchesArgs = {
   limit: Scalars['Int'];
   page: Scalars['Int'];
   sortBy?: InputMaybe<CaseBatchesSortingInput>;
+};
+
+
+export type QueryCasesArgs = {
+  filter?: InputMaybe<CasesFilterInput>;
+  limit: Scalars['Int'];
+  page: Scalars['Int'];
+  sortBy?: InputMaybe<CasesSortingInput>;
 };
 
 
@@ -256,16 +344,23 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
+  Address: ResolverTypeWrapper<Address>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Case: ResolverTypeWrapper<Case>;
   CaseBatch: ResolverTypeWrapper<CaseBatch>;
+  CaseBatchStatus: CaseBatchStatus;
   CaseBatchesCountableConnection: ResolverTypeWrapper<CaseBatchesCountableConnection>;
   CaseBatchesCountableEdge: ResolverTypeWrapper<CaseBatchesCountableEdge>;
   CaseBatchesSortingInput: CaseBatchesSortingInput;
-  Cases: ResolverTypeWrapper<Cases>;
+  CasesCountableConnection: ResolverTypeWrapper<CasesCountableConnection>;
+  CasesCountableEdge: ResolverTypeWrapper<CasesCountableEdge>;
+  CasesFilterInput: CasesFilterInput;
+  CasesSortingInput: CasesSortingInput;
   Client: ResolverTypeWrapper<Client>;
   ClientCountableConnection: ResolverTypeWrapper<ClientCountableConnection>;
   ClientCountableEdge: ResolverTypeWrapper<ClientCountableEdge>;
   CommonStatus: CommonStatus;
+  Contacts: ResolverTypeWrapper<Contacts>;
   CreateClient: ResolverTypeWrapper<CreateClient>;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
@@ -278,6 +373,7 @@ export type ResolversTypes = ResolversObject<{
   OrderDirection: OrderDirection;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   Pagination: ResolverTypeWrapper<Pagination>;
+  PaginationItems: ResolverTypeWrapper<PaginationItems>;
   Person: ResolverTypeWrapper<Person>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -290,15 +386,21 @@ export type ResolversTypes = ResolversObject<{
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
+  Address: Address;
   Boolean: Scalars['Boolean'];
+  Case: Case;
   CaseBatch: CaseBatch;
   CaseBatchesCountableConnection: CaseBatchesCountableConnection;
   CaseBatchesCountableEdge: CaseBatchesCountableEdge;
   CaseBatchesSortingInput: CaseBatchesSortingInput;
-  Cases: Cases;
+  CasesCountableConnection: CasesCountableConnection;
+  CasesCountableEdge: CasesCountableEdge;
+  CasesFilterInput: CasesFilterInput;
+  CasesSortingInput: CasesSortingInput;
   Client: Client;
   ClientCountableConnection: ClientCountableConnection;
   ClientCountableEdge: ClientCountableEdge;
+  Contacts: Contacts;
   CreateClient: CreateClient;
   Date: Scalars['Date'];
   DateTime: Scalars['DateTime'];
@@ -310,6 +412,7 @@ export type ResolversParentTypes = ResolversObject<{
   Node: never;
   PageInfo: PageInfo;
   Pagination: Pagination;
+  PaginationItems: PaginationItems;
   Person: Person;
   Query: {};
   String: Scalars['String'];
@@ -319,17 +422,43 @@ export type ResolversParentTypes = ResolversObject<{
   importCasesInput: ImportCasesInput;
 }>;
 
+export type AddressResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = ResolversObject<{
+  address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  isDeleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>;
+  region?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  zipCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CaseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Case'] = ResolversParentTypes['Case']> = ResolversObject<{
+  caseBatch?: Resolver<Maybe<ResolversTypes['CaseBatch']>, ParentType, ContextType>;
+  caseReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  caseUniqueBatchId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  clientReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  isDeleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type CaseBatchResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CaseBatch'] = ResolversParentTypes['CaseBatch']> = ResolversObject<{
   assignmentEndDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   assignmentStartDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  batch_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  batch_reference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  cases?: Resolver<Maybe<Array<Maybe<ResolversTypes['Cases']>>>, ParentType, ContextType>;
+  batchId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  batchReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  cases?: Resolver<Maybe<Array<Maybe<ResolversTypes['Case']>>>, ParentType, ContextType>;
   client?: Resolver<Maybe<ResolversTypes['Client']>, ParentType, ContextType>;
   createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   isDeleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  status?: Resolver<Maybe<ResolversTypes['CaseBatchStatus']>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -347,11 +476,16 @@ export type CaseBatchesCountableEdgeResolvers<ContextType = MyContext, ParentTyp
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type CasesResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Cases'] = ResolversParentTypes['Cases']> = ResolversObject<{
-  caseBatch?: Resolver<Maybe<ResolversTypes['CaseBatch']>, ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  isDeleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>;
+export type CasesCountableConnectionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CasesCountableConnection'] = ResolversParentTypes['CasesCountableConnection']> = ResolversObject<{
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes['CasesCountableEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CasesCountableEdgeResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CasesCountableEdge'] = ResolversParentTypes['CasesCountableEdge']> = ResolversObject<{
+  node?: Resolver<ResolversTypes['Case'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -360,7 +494,7 @@ export type ClientResolvers<ContextType = MyContext, ParentType extends Resolver
   createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  status?: Resolver<ResolversTypes['CommonStatus'], ParentType, ContextType>;
+  status?: Resolver<Maybe<ResolversTypes['CommonStatus']>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -375,6 +509,16 @@ export type ClientCountableConnectionResolvers<ContextType = MyContext, ParentTy
 
 export type ClientCountableEdgeResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['ClientCountableEdge'] = ResolversParentTypes['ClientCountableEdge']> = ResolversObject<{
   node?: Resolver<ResolversTypes['Client'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type ContactsResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Contacts'] = ResolversParentTypes['Contacts']> = ResolversObject<{
+  contactValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>;
+  type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -417,6 +561,7 @@ export type NodeResolvers<ContextType = MyContext, ParentType extends ResolversP
 export type PageInfoResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
   next?: Resolver<Maybe<ResolversTypes['Pagination']>, ParentType, ContextType>;
   previous?: Resolver<Maybe<ResolversTypes['Pagination']>, ParentType, ContextType>;
+  showing?: Resolver<Maybe<ResolversTypes['PaginationItems']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -426,15 +571,31 @@ export type PaginationResolvers<ContextType = MyContext, ParentType extends Reso
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type PaginationItemsResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['PaginationItems'] = ResolversParentTypes['PaginationItems']> = ResolversObject<{
+  from?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  to?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type PersonResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = ResolversObject<{
-  Cases?: Resolver<Maybe<ResolversTypes['Cases']>, ParentType, ContextType>;
+  address?: Resolver<Maybe<Array<Maybe<ResolversTypes['Address']>>>, ParentType, ContextType>;
+  birthDay?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  cases?: Resolver<Maybe<ResolversTypes['Case']>, ParentType, ContextType>;
+  contacs?: Resolver<Maybe<Array<Maybe<ResolversTypes['Contacts']>>>, ParentType, ContextType>;
+  createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  firstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  gender?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   isDeleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  lastName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  case?: Resolver<Maybe<ResolversTypes['Case']>, ParentType, ContextType, RequireFields<QueryCaseArgs, 'id'>>;
   caseBatches?: Resolver<Maybe<ResolversTypes['CaseBatchesCountableConnection']>, ParentType, ContextType, RequireFields<QueryCaseBatchesArgs, 'limit' | 'page'>>;
+  cases?: Resolver<Maybe<ResolversTypes['CasesCountableConnection']>, ParentType, ContextType, RequireFields<QueryCasesArgs, 'limit' | 'page'>>;
   clients?: Resolver<Maybe<ResolversTypes['ClientCountableConnection']>, ParentType, ContextType, RequireFields<QueryClientsArgs, 'limit' | 'page'>>;
 }>;
 
@@ -447,13 +608,17 @@ export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
 }
 
 export type Resolvers<ContextType = MyContext> = ResolversObject<{
+  Address?: AddressResolvers<ContextType>;
+  Case?: CaseResolvers<ContextType>;
   CaseBatch?: CaseBatchResolvers<ContextType>;
   CaseBatchesCountableConnection?: CaseBatchesCountableConnectionResolvers<ContextType>;
   CaseBatchesCountableEdge?: CaseBatchesCountableEdgeResolvers<ContextType>;
-  Cases?: CasesResolvers<ContextType>;
+  CasesCountableConnection?: CasesCountableConnectionResolvers<ContextType>;
+  CasesCountableEdge?: CasesCountableEdgeResolvers<ContextType>;
   Client?: ClientResolvers<ContextType>;
   ClientCountableConnection?: ClientCountableConnectionResolvers<ContextType>;
   ClientCountableEdge?: ClientCountableEdgeResolvers<ContextType>;
+  Contacts?: ContactsResolvers<ContextType>;
   CreateClient?: CreateClientResolvers<ContextType>;
   Date?: GraphQLScalarType;
   DateTime?: GraphQLScalarType;
@@ -463,6 +628,7 @@ export type Resolvers<ContextType = MyContext> = ResolversObject<{
   Node?: NodeResolvers<ContextType>;
   PageInfo?: PageInfoResolvers<ContextType>;
   Pagination?: PaginationResolvers<ContextType>;
+  PaginationItems?: PaginationItemsResolvers<ContextType>;
   Person?: PersonResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Time?: GraphQLScalarType;
