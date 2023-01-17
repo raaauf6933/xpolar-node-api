@@ -60,7 +60,13 @@ const findCases = async (
       },
       AND: {
         person: {
-          ...(firstName ? { firstName } : {}),
+          ...(firstName
+            ? {
+                firstName: {
+                  contains: firstName,
+                },
+              }
+            : {}),
           AND: {
             ...(lastName ? { lastName } : {}),
           },
