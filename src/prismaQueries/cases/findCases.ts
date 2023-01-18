@@ -43,36 +43,114 @@ const findCases = async (
   cases: Cases;
 }> => {
   const { filter } = Opts;
+  const spreadFilter = { ...filter };
 
-  const firstName = filter?.firstName;
-  const lastName = filter?.lastName;
+  const {
+    batchNumber,
+    birthDate,
+    clientReference,
+    debtorId,
+    department,
+    firstName,
+    lastName,
+    status,
+  } = spreadFilter;
+
+  const batchNumbers = batchNumber?.split(',');
+
+  const getBatchNumbers = () => {
+    if (batchNumbers && batchNumbers.length > 0) {
+      // const filterBatchNumbers = {
+      //   batchReference: {},
+      // };
+
+      const batches = batchNumbers.map((e)=> ({
+        caseBatch: {
+          batchReference: {
+            startsWith: e,
+          },
+        }
+      }))
+
+      // batchNumbers?.reduce(function (o, s) {
+      //   return (o['AND'] = {
+      //     batchReference: {
+      //       startsWith: s,
+      //     },
+      //   });
+      // }, filterBatchNumbers);
+
+      // filterBatchNumbers.batchReference = {
+      //   startsWith: batchNumbers[0],
+      // };
+
+      return batches;
+    } else {
+      return {};
+    }
+
+    // batchNumbers?.forEach((val,index)=> {
+
+    //   // if(index === 0){
+    //   //   filterBatchNumbers.batchReference = {
+
+    //   //   }
+    //   // }else{
+
+    //   // }
+
+    // })
+  };
+
+  
 
   const filterOpts: FilterOpts = {
     isDeleted: false,
-    AND: {
-      caseBatch: {
-        status: 'SUCCESS',
-        AND: {
-          batchReference: {
-            in: ['20100002', '20200001'],
-          },
+    // AND: {
+
+    AND: [
+      {
+        caseBatch: {
+          status: 'SUCCESS',
         },
       },
-      AND: {
-        person: {
-          ...(firstName
-            ? {
-                firstName: {
-                  contains: firstName,
-                },
-              }
-            : {}),
-          AND: {
-            ...(lastName ? { lastName } : {}),
-          },
-        },
+
+      {
+        OR: getBatchNumbers(),
       },
-    },
+    ],
+
+    // {
+
+    // batchReference: {
+    //     in:batchNumbers,
+
+    // },
+    // OR:{
+    //   batchReference:{
+    //     startsWith:""
+    //   },
+    //   OR:{
+    //     batchReference:""
+    //   }
+    // },
+    // },
+    // },
+    //   AND: {
+    //     person: {
+    //       ...(firstName
+    //         ? {
+    //             firstName: {
+    //               contains: firstName,
+    //             },
+    //           }
+    //         : {}),
+    //       AND: {
+    //         ...(lastName ? { lastName } : {}),
+    //       },
+    //     },
+    //   },
+    // },
   };
 
   const [count, cases] = await prisma.$transaction([

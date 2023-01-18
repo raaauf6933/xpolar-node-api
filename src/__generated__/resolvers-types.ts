@@ -83,10 +83,24 @@ export type CaseBatchesSortingInput = {
   direction: OrderDirection;
 };
 
+export enum CaseDepartment {
+  All = 'ALL',
+  FirstCollection = 'FIRST_COLLECTION',
+  Quarantine = 'QUARANTINE',
+  SecondCollection = 'SECOND_COLLECTION'
+}
+
+export enum CaseStatus {
+  All = 'ALL',
+  CollectionFinished = 'COLLECTION_FINISHED',
+  InCollection = 'IN_COLLECTION'
+}
+
 export type CasesCountableConnection = {
   __typename?: 'CasesCountableConnection';
   count: Scalars['Int'];
   edges: Array<CasesCountableEdge>;
+  errors?: Maybe<Array<Maybe<Error>>>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int'];
 };
@@ -98,9 +112,13 @@ export type CasesCountableEdge = {
 
 export type CasesFilterInput = {
   batchNumber?: InputMaybe<Scalars['String']>;
+  birthDate?: InputMaybe<Scalars['String']>;
   clientReference?: InputMaybe<Scalars['String']>;
+  debtorId?: InputMaybe<Scalars['String']>;
+  department?: InputMaybe<Scalars['String']>;
   firstName?: InputMaybe<Scalars['String']>;
   lastName?: InputMaybe<Scalars['String']>;
+  status?: InputMaybe<Scalars['String']>;
 };
 
 export type CasesSortingInput = {
@@ -352,6 +370,8 @@ export type ResolversTypes = ResolversObject<{
   CaseBatchesCountableConnection: ResolverTypeWrapper<CaseBatchesCountableConnection>;
   CaseBatchesCountableEdge: ResolverTypeWrapper<CaseBatchesCountableEdge>;
   CaseBatchesSortingInput: CaseBatchesSortingInput;
+  CaseDepartment: CaseDepartment;
+  CaseStatus: CaseStatus;
   CasesCountableConnection: ResolverTypeWrapper<CasesCountableConnection>;
   CasesCountableEdge: ResolverTypeWrapper<CasesCountableEdge>;
   CasesFilterInput: CasesFilterInput;
@@ -479,6 +499,7 @@ export type CaseBatchesCountableEdgeResolvers<ContextType = MyContext, ParentTyp
 export type CasesCountableConnectionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CasesCountableConnection'] = ResolversParentTypes['CasesCountableConnection']> = ResolversObject<{
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   edges?: Resolver<Array<ResolversTypes['CasesCountableEdge']>, ParentType, ContextType>;
+  errors?: Resolver<Maybe<Array<Maybe<ResolversTypes['Error']>>>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

@@ -1,9 +1,12 @@
 import { QueryCasesArgs } from '@/__generated__/resolvers-types';
+import filterValidator from '@/controller/cases/CasesQuery/filter.validator';
 import findCases from '@/prismaQueries/cases/findCases';
 import { nodeListPaginate } from '@utils/nodeListPaginate';
 
 const Cases = async (_, args: QueryCasesArgs) => {
   const { limit, page, filter } = args;
+
+  const errors = filterValidator(args.filter);
 
   const { cases, count } = await findCases({
     limit,
@@ -16,11 +19,11 @@ const Cases = async (_, args: QueryCasesArgs) => {
 
   // format shape of db result
   const data = cases.map((caseBatch) => ({
-    ...caseBatch,
-    caseBatch: caseBatch.caseBatch,
-  }));
+          ...caseBatch,
+          caseBatch: caseBatch.caseBatch,
+        }));
 
-  return nodeListPaginate(page, limit, data, count);
+  return nodeListPaginate(page, limit, data, count, errors);
 };
 
 export default Cases;

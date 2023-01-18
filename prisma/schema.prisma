@@ -16,9 +16,21 @@ enum CommonStatus {
 }
 
 enum CaseBatchStatus {
-  SUCCESS
+ 
+   SUCCESS
   UPLOADING
   FAILED
+}
+
+enum CaseStatus {
+ IN_COLLECTION
+COLLECTION_FINISHED
+}
+
+enum CaseDepartment {
+  FIRST_COLLECTION
+  SECOND_COLLECTION
+  QUARANTINE
 }
 
 model client {
@@ -56,6 +68,8 @@ model cases {
   caseUniqueBatchId String
   person person @relation(fields: [personId], references: [id])
   personId Int
+  status CaseStatus @default(IN_COLLECTION)
+  department CaseDepartment @default(FIRST_COLLECTION)
   isDeleted  Boolean      @default(false)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt

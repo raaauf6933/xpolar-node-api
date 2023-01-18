@@ -38,6 +38,19 @@ enum CaseBatchStatus {
   FAILED
 }
 
+enum CaseStatus {
+  ALL
+  IN_COLLECTION
+  COLLECTION_FINISHED
+}
+
+enum CaseDepartment {
+  ALL
+  FIRST_COLLECTION
+  SECOND_COLLECTION
+  QUARANTINE
+}
+
 enum CommonStatus {
   ACT
   DEACT
@@ -133,6 +146,7 @@ type CaseBatchesCountableConnection {
 }
 
 type CasesCountableConnection {
+  errors: [Error]
   pageInfo: PageInfo!
   edges: [CasesCountableEdge!]!
   count: Int!
@@ -178,9 +192,13 @@ input CasesSortingInput {
 
 input CasesFilterInput {
   batchNumber: String
-  clientReference: String
   firstName: String
   lastName: String
+  status: String
+  clientReference: String
+  department: String
+  birthDate: String
+  debtorId: String
 }
 
 type ImportCases {

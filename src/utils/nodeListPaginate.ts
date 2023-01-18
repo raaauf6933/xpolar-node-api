@@ -1,10 +1,11 @@
-import { PageInfo } from '@types';
+import { Error, PageInfo } from '@types';
 
 export const nodeListPaginate = <T extends object>(
   page: number,
   limit: number,
   data: T[],
-  count: number
+  count: number,
+  errors: Error[] | null
 ) => {
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
@@ -36,9 +37,10 @@ export const nodeListPaginate = <T extends object>(
   };
 
   return {
-    edges: result,
-    count: data.length,
-    totalCount: count,
-    pageInfo,
+    edges: errors && errors?.length > 0 ? [] : result,
+    count: errors && errors?.length > 0 ? 0 : data.length,
+    totalCount: errors && errors?.length > 0 ? 0 : count,
+    pageInfo: errors && errors?.length > 0 ? {} : pageInfo,
+    errors,
   };
 };
